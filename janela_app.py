@@ -57,6 +57,43 @@ class JanelaApp:
         self.tamanho_mundo_slider.set(30)  # Valor inicial
         self.tamanho_mundo_slider.pack()
         
+        # Crie os campos de entrada para os parâmetros
+        self.scale_label = tk.Label(self.barra_lateral, text="Scale:")
+        self.scale_label.pack()
+        self.scale_entry = tk.Entry(self.barra_lateral)
+        self.scale_entry.insert(0, "100.0")  # Valor padrão
+        self.scale_entry.pack()
+
+        self.octaves_label = tk.Label(self.barra_lateral, text="Octaves:")
+        self.octaves_label.pack()
+        self.octaves_entry = tk.Entry(self.barra_lateral)
+        self.octaves_entry.insert(0, "6")  # Valor padrão
+        self.octaves_entry.pack()
+
+        self.persistence_label = tk.Label(self.barra_lateral, text="Persistence:")
+        self.persistence_label.pack()
+        self.persistence_entry = tk.Entry(self.barra_lateral)
+        self.persistence_entry.insert(0, "0.5")  # Valor padrão
+        self.persistence_entry.pack()
+
+        self.lacunarity_label = tk.Label(self.barra_lateral, text="Lacunarity:")
+        self.lacunarity_label.pack()
+        self.lacunarity_entry = tk.Entry(self.barra_lateral)
+        self.lacunarity_entry.insert(0, "2.0")  # Valor padrão
+        self.lacunarity_entry.pack()
+
+        self.min_value_label = tk.Label(self.barra_lateral, text="Min Value:")
+        self.min_value_label.pack()
+        self.min_value_entry = tk.Entry(self.barra_lateral)
+        self.min_value_entry.insert(0, "-1.0")  # Valor padrão
+        self.min_value_entry.pack()
+
+        self.max_value_label = tk.Label(self.barra_lateral, text="Max Value:")
+        self.max_value_label.pack()
+        self.max_value_entry = tk.Entry(self.barra_lateral)
+        self.max_value_entry.insert(0, "1.0")  # Valor padrão
+        self.max_value_entry.pack()
+        
         # Adicione a Checkbox para definir o contorno
         self.checkbox_contorno_var = tk.IntVar()
         self.checkbox_contorno = tk.Checkbutton(self.barra_lateral, text="Exibir Grid", variable=self.checkbox_contorno_var)
@@ -84,9 +121,20 @@ class JanelaApp:
         
         # Verifique se a Checkbox de contorno está marcada
         exibir_contorno = self.checkbox_contorno_var.get() == 1
+        
+        # Obtenha os valores dos parâmetros da entrada do usuário
+        scale = float(self.scale_entry.get())
+        octaves = int(self.octaves_entry.get())
+        persistence = float(self.persistence_entry.get())
+        lacunarity = float(self.lacunarity_entry.get())
+        min_value = float(self.min_value_entry.get())
+        max_value = float(self.max_value_entry.get())
 
         # Crie uma instância de Mundo com o tamanho escolhido
         mundo = Mundo(tamanho_mundo, tamanho_mundo)
+        
+        # Chame o método para gerar o terreno com base nos parâmetros
+        mundo.gerar_terrenos_base(scale, octaves, persistence, lacunarity, min_value, max_value)
 
         # Limpe o canvas para remover desenhos anteriores
         self.canvas.delete("all")

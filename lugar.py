@@ -1,7 +1,7 @@
 import random
 
 class Lugar:
-    def __init__(self, x, y, terreno, conteudo=None, passavel=True):
+    def __init__(self, x, y, conteudo=None, passavel=True):
         self.x = x
         self.y = y
         self.terreno = self.gerar_terreno()
@@ -30,7 +30,7 @@ class Lugar:
     def gerar_terreno(self):
         # Probabilidades para cada tipo de terreno
         terrenos = ["agua", "terra", "grama", "rocha"]
-        chances = [0.20, 0.25, 0.30, 0.25]
+        chances = [0.10, 0.30, 0.40, 0.20]
         terreno_escolhido = random.choices(terrenos, chances)[0]
         return terreno_escolhido
 
@@ -39,3 +39,4 @@ class Lugar:
 
     def tornar_impassavel(self):
         self.passavel = False
+        
