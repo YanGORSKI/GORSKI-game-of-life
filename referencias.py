@@ -1,9 +1,11 @@
 # Dicionário de Cores
 cores = {
-    "azul_claro": "#ADD8E6",
+    "azul_claro": "#5cdbd5",
     "marrom": "#8B4513",
     "verde_escuro": "#006400",
     "cinza": "#808080",
+    "marrom_claro": "#827b56",
+    "verde_musgo": "#597d27",
     "grid": "#00000080"
     # Adicione mais cores conforme necessário
 }
@@ -17,11 +19,11 @@ terrenos = {
     },
     "terra": {
         "passavel": True,
-        "cor": cores["marrom"]
+        "cor": cores["marrom_claro"]
     },
     "grama": {
         "passavel": True,
-        "cor": cores["verde_escuro"]
+        "cor": cores["verde_musgo"]
     },
     "rocha": {
         "passavel": False,

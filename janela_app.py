@@ -2,29 +2,21 @@ import tkinter as tk
 from tkinter import Scale, Checkbutton, IntVar
 from mundo import Mundo
 from referencias import terrenos
+from timer_module import Timer
 from config import (
     largura_janela,
     altura_janela,
     tamanho_minimo_mapa,
     tamanho_maximo_mapa,
     proporcao_barra_lateral,
-    microticks_por_tick,
-    ticks_por_dia,
     taxa_att
 )
-
-import time
 
 class JanelaApp:
     def __init__(self, janela):
         self.janela = janela
         self.iniciado = False
-        self.tempo_inicial = 0
-        self.tempo_pausado = 0
-        self.tempo_total = 0
-        self.tick_atual = 0
-        self.microtick_atual = 0
-        self.dias_passados = 0
+        self.tempo = Timer()
 
         # Obtenha o tamanho da janela
         largura, altura = largura_janela, altura_janela
@@ -41,10 +33,7 @@ class JanelaApp:
         # Crie o frame da barra lateral
         self.barra_lateral = tk.Frame(self.janela, width=largura_barra_lateral, height=altura_janela, bg="lightgray")
         self.barra_lateral.grid(row=0, column=0, rowspan=2)
-
-        self.botao_iniciar = tk.Button(self.barra_lateral, text="Iniciar", command=self.alternar_iniciar_pausar)
-        self.botao_iniciar.pack(side="bottom", pady=20)
-
+        
         # Crie o Canvas como um quadrado com o lado igual à altura da janela
         self.canvas = tk.Canvas(self.janela, width=altura_janela, height=altura_janela, bg="white")
         self.canvas.grid(row=0, column=1)
@@ -57,50 +46,99 @@ class JanelaApp:
         self.tamanho_mundo_slider.set(30)  # Valor inicial
         self.tamanho_mundo_slider.pack()
         
+        # Crie o LabelFrame para o grupo "Ruído"
+        self.ruido_frame = tk.LabelFrame(self.barra_lateral, text="Ruído", padx=10, pady=10)
+        self.ruido_frame.pack(side="left", padx=10)
+
+        self.botao_iniciar = tk.Button(self.barra_lateral, text="Iniciar", command=self.alternar_iniciar_pausar)
+        self.botao_iniciar.pack(side="bottom", pady=20)
+        
         # Crie os campos de entrada para os parâmetros
-        self.scale_label = tk.Label(self.barra_lateral, text="Scale:")
+        self.scale_label = tk.Label(self.ruido_frame, text="Scale:")
         self.scale_label.pack()
-        self.scale_entry = tk.Entry(self.barra_lateral)
+        self.scale_entry = tk.Entry(self.ruido_frame)
         self.scale_entry.insert(0, "100.0")  # Valor padrão
         self.scale_entry.pack()
 
-        self.octaves_label = tk.Label(self.barra_lateral, text="Octaves:")
+        self.octaves_label = tk.Label(self.ruido_frame, text="Octaves:")
         self.octaves_label.pack()
-        self.octaves_entry = tk.Entry(self.barra_lateral)
+        self.octaves_entry = tk.Entry(self.ruido_frame)
         self.octaves_entry.insert(0, "6")  # Valor padrão
         self.octaves_entry.pack()
 
-        self.persistence_label = tk.Label(self.barra_lateral, text="Persistence:")
+        self.persistence_label = tk.Label(self.ruido_frame, text="Persistence:")
         self.persistence_label.pack()
-        self.persistence_entry = tk.Entry(self.barra_lateral)
+        self.persistence_entry = tk.Entry(self.ruido_frame)
         self.persistence_entry.insert(0, "0.5")  # Valor padrão
         self.persistence_entry.pack()
 
-        self.lacunarity_label = tk.Label(self.barra_lateral, text="Lacunarity:")
+        self.lacunarity_label = tk.Label(self.ruido_frame, text="Lacunarity:")
         self.lacunarity_label.pack()
-        self.lacunarity_entry = tk.Entry(self.barra_lateral)
+        self.lacunarity_entry = tk.Entry(self.ruido_frame)
         self.lacunarity_entry.insert(0, "2.0")  # Valor padrão
         self.lacunarity_entry.pack()
 
-        self.min_value_label = tk.Label(self.barra_lateral, text="Min Value:")
+        self.min_value_label = tk.Label(self.ruido_frame, text="Min Value:")
         self.min_value_label.pack()
-        self.min_value_entry = tk.Entry(self.barra_lateral)
+        self.min_value_entry = tk.Entry(self.ruido_frame)
         self.min_value_entry.insert(0, "-1.0")  # Valor padrão
         self.min_value_entry.pack()
 
-        self.max_value_label = tk.Label(self.barra_lateral, text="Max Value:")
+        self.max_value_label = tk.Label(self.ruido_frame, text="Max Value:")
         self.max_value_label.pack()
-        self.max_value_entry = tk.Entry(self.barra_lateral)
+        self.max_value_entry = tk.Entry(self.ruido_frame)
         self.max_value_entry.insert(0, "1.0")  # Valor padrão
         self.max_value_entry.pack()
         
+        self.repeatx_label = tk.Label(self.ruido_frame, text="Repeat X:")
+        self.repeatx_label.pack()
+        self.repeatx_entry = tk.Entry(self.ruido_frame)
+        self.repeatx_entry.insert(0, "1024")
+        self.repeatx_entry.pack()
+
+        self.repeaty_label = tk.Label(self.ruido_frame, text="Repeat Y:")
+        self.repeaty_label.pack()
+        self.repeaty_entry = tk.Entry(self.ruido_frame)
+        self.repeaty_entry.insert(0, "1024")
+        self.repeaty_entry.pack()
+
+        self.base_label = tk.Label(self.ruido_frame, text="Base:")
+        self.base_label.pack()
+        self.base_entry = tk.Entry(self.ruido_frame)
+        self.base_entry.insert(0, "24")
+        self.base_entry.pack()
+        
+        # Crie o LabelFrame para o grupo "Terreno"
+        self.terreno_frame = tk.LabelFrame(self.barra_lateral, text="Terreno", padx=10, pady=10)
+        self.terreno_frame.pack(side="right", padx=10)
+        
+        # Crie campos de entrada para os parâmetros de "Terreno" dentro do terreno_frame
+        self.altura_agua_label = tk.Label(self.terreno_frame, text="Altura da Água:")
+        self.altura_agua_label.pack()
+        self.altura_agua_entry = tk.Entry(self.terreno_frame)
+        self.altura_agua_entry.insert(0, "0.3")  # Valor padrão
+        self.altura_agua_entry.pack()
+        
+        self.altura_terra_label = tk.Label(self.terreno_frame, text="Altura da Terra:")
+        self.altura_terra_label.pack()
+        self.altura_terra_entry = tk.Entry(self.terreno_frame)
+        self.altura_terra_entry.insert(0, "0.5")  # Valor padrão
+        self.altura_terra_entry.pack()
+        
+        self.altura_grama_label = tk.Label(self.terreno_frame, text="Altura da Grama:")
+        self.altura_grama_label.pack()
+        self.altura_grama_entry = tk.Entry(self.terreno_frame)
+        self.altura_grama_entry.insert(0, "0.8")  # Valor padrão
+        self.altura_grama_entry.pack()
+        
+                
         # Adicione a Checkbox para definir o contorno
         self.checkbox_contorno_var = tk.IntVar()
-        self.checkbox_contorno = tk.Checkbutton(self.barra_lateral, text="Exibir Grid", variable=self.checkbox_contorno_var)
+        self.checkbox_contorno = tk.Checkbutton(self.terreno_frame, text="Exibir Grid", variable=self.checkbox_contorno_var)
         self.checkbox_contorno.pack()
         
         # Crie o botão 'Gerar Terreno' na barra lateral
-        self.botao_gerar_terreno = tk.Button(self.barra_lateral, text="Gerar Terreno", command=self.gerar_terreno)
+        self.botao_gerar_terreno = tk.Button(self.terreno_frame, text="Gerar Terreno", command=self.gerar_terreno)
         self.botao_gerar_terreno.pack(side="top", padx=20)
         
         # Crie os rótulos para os contadores
@@ -110,10 +148,8 @@ class JanelaApp:
         # Adicione os rótulos à barra lateral
         self.label_tempo.pack()
         self.label_contadores.pack()
-
-    def iniciar_simulador(self):
-        # Adicione a lógica para iniciar o simulador aqui
-        pass
+        
+        self.atualizar_tempo()
 
     def gerar_terreno(self):
         # Obtenha o tamanho do mundo do slider
@@ -129,12 +165,29 @@ class JanelaApp:
         lacunarity = float(self.lacunarity_entry.get())
         min_value = float(self.min_value_entry.get())
         max_value = float(self.max_value_entry.get())
+        repeatx = int(self.repeatx_entry.get())
+        repeaty = int(self.repeaty_entry.get())
+        base = int(self.base_entry.get())
+        altura_agua = float(self.altura_agua_entry.get())
+        altura_terra = float(self.altura_terra_entry.get())
+        altura_grama = float(self.altura_grama_entry.get())
 
         # Crie uma instância de Mundo com o tamanho escolhido
         mundo = Mundo(tamanho_mundo, tamanho_mundo)
         
         # Chame o método para gerar o terreno com base nos parâmetros
-        mundo.gerar_terrenos_base(scale, octaves, persistence, lacunarity, min_value, max_value)
+        mundo.gerar_terrenos_base(scale,
+                                  octaves,
+                                  persistence,
+                                  lacunarity,
+                                  min_value,
+                                  max_value,
+                                  repeatx,
+                                  repeaty,
+                                  base,
+                                  altura_agua,
+                                  altura_terra,
+                                  altura_grama)
 
         # Limpe o canvas para remover desenhos anteriores
         self.canvas.delete("all")
@@ -163,60 +216,43 @@ class JanelaApp:
 
     def alternar_iniciar_pausar(self):
         if self.iniciado:
-            # Pausar
-            self.iniciado = False
+            # PAUSA
+            
             self.botao_iniciar.config(text="Iniciar")
-            # Chame o método na instância de ControleJanela
-            self.iniciar_tempo(False)
+            self.tempo.pausar()
         else:
-            # Iniciar
-            self.iniciado = True
+            # INICIA
             self.botao_iniciar.config(text="Pausar")
-            # Chame o método na instância de ControleJanela
-            self.iniciar_tempo(True)
-
-    def atualizar_contadores_continuamente(self):
-        # Atualize os contadores aqui
-        self.atualizar_contadores()
-
-        # Chame a função update para atualizar a interface
-        self.janela.update()
-
-        # Agende a próxima chamada para continuar atualizando os contadores
-        self.janela.after(taxa_att, self.atualizar_contadores_continuamente)
-
-    def iniciar(self):
-        self.janela.mainloop()
+            self.tempo.iniciar()
+        self.iniciado = not self.iniciado
         
-    def iniciar_tempo(self, iniciar):
-        if iniciar:
-            self.iniciado = True
-            self.atualizar_contadores_continuamente()
-        else:
-            self.iniciado = False
-            
-    def pausar_tempo(self):
+    def atualizar_tempo(self):
         if self.iniciado:
-            self.tempo_pausado = time.time() - self.tempo_inicial
-            self.iniciado = False
+            # Atualize os rótulos
+            self.atualizar_contadores()
+            # Agende a próxima atualização após um curto intervalo
+            self.janela.after(taxa_att, self.atualizar_tempo)  # Atualizar de acordo com a taxa
     
-    def continuar_tempo(self):
-        if not self.iniciado:
-            self.iniciado = True
-            self.tempo_inicial = time.time() - self.tempo_pausado
-            
     def atualizar_contadores(self):
         if self.iniciado:
-            self.tempo_decorrido = time.time() - self.tempo_inicial
-            self.microticks_decorridos = int(self.tempo_decorrido * microticks_por_tick)
-            self.ticks_decorridos = self.microticks_decorridos // microticks_por_tick
-            self.microtick_atual = self.microticks_decorridos % microticks_por_tick
-            self.dias_passados = self.ticks_decorridos // ticks_por_dia
-            segundos = int(self.tempo_decorrido)
+            # Obtenha informações de tempo do objeto Timer
+            informacoes_tempo = self.tempo.obter_informacoes_tempo()
+            tempo_decorrido = informacoes_tempo['tempo_decorrido']
+            microticks_decorridos = informacoes_tempo['microticks_decorridos']
+            ticks_decorridos = informacoes_tempo['ticks_decorridos']
+            microtick_atual = informacoes_tempo['microtick_atual']
+            dias_passados = informacoes_tempo['dias_passados']
+
+            # Converta o tempo decorrido para horas, minutos e segundos
+            segundos = int(tempo_decorrido)
             minutos, segundos = divmod(segundos, 60)
             horas, minutos = divmod(minutos, 60)
+
+            # Formate o tempo em uma string
             tempo_formatado = f"{horas:02d}:{minutos:02d}:{segundos:02d}"
-            contadores = f"Dia {self.dias_passados} | {self.ticks_decorridos}.{self.microtick_atual}"
+
+            # Atualize os rótulos com as informações
+            contadores = f"Dia {dias_passados} | {ticks_decorridos}.{microtick_atual}"
             self.label_tempo.config(text=f"Tempo Decorrido: {tempo_formatado}")
             self.label_contadores.config(text=contadores)
     
