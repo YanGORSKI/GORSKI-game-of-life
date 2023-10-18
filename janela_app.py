@@ -18,6 +18,7 @@ class JanelaApp:
         self.iniciado = False
         self.tempo = Timer()
 
+
         # Obtenha o tamanho da janela
         largura, altura = largura_janela, altura_janela
 
@@ -217,21 +218,26 @@ class JanelaApp:
     def alternar_iniciar_pausar(self):
         if self.iniciado:
             # PAUSA
-            
             self.botao_iniciar.config(text="Iniciar")
             self.tempo.pausar()
         else:
             # INICIA
             self.botao_iniciar.config(text="Pausar")
             self.tempo.iniciar()
+            informacoes_tempo = self.tempo.obter_informacoes_tempo()
+            microticks_decorridos = informacoes_tempo['microticks_decorridos']
+            self.janela.after(microticks_decorridos, self.atualizar_tempo)  
         self.iniciado = not self.iniciado
-        
+            
     def atualizar_tempo(self):
         if self.iniciado:
             # Atualize os rótulos
             self.atualizar_contadores()
             # Agende a próxima atualização após um curto intervalo
-            self.janela.after(taxa_att, self.atualizar_tempo)  # Atualizar de acordo com a taxa
+            informacoes_tempo = self.tempo.obter_informacoes_tempo()
+            microticks_decorridos = informacoes_tempo['microticks_decorridos']
+            self.janela.after(microticks_decorridos, self.atualizar_tempo)
+
     
     def atualizar_contadores(self):
         if self.iniciado:
