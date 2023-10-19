@@ -1,6 +1,9 @@
 import pygame
+import referencias
+import config
 from mundo import Mundo
 from lugar import Lugar
+
 
 # Defina algumas cores
 # ...
@@ -12,17 +15,32 @@ class Canvas:
 
     def atualizar(self):
         self.criar_canvas()
-    
+        
     def criar_canvas(self):
+        exibir_contorno = True
+        tamanho_mundo = 24
+        tamanho_quadrado = config.altura_janela / tamanho_mundo
+        
         # Adicione a lógica para desenhar o mundo no "canvas" aqui
         if self.mundo:
-            # Itere sobre o mundo e desenhe os elementos gráficos na tela
-            for y in range(self.mundo.altura):
-                for x in range(self.mundo.largura):
+           # Percorra todos os lugares do mundo
+            for y in range(tamanho_mundo):
+                for x in range(tamanho_mundo):
                     lugar = self.mundo.obter_lugar(x, y)
-                    # Desenhe a célula com base no terreno, posição e outros parâmetros
-                    # Use pygame.draw.rect para desenhar os terrenos no "canvas"
-                    # Por exemplo: pygame.draw.rect(self.screen, lugar.terreno, (x * tamanho_celula, y * tamanho_celula, tamanho_celula, tamanho_celula))
+                    tipo_terreno = lugar.terreno
+                    cor = referencias.terrenos[tipo_terreno]["cor"]
+
+                    # Calcule as coordenadas do retângulo
+                    x1 = x * tamanho_quadrado
+                    y1 = y * tamanho_quadrado
+                    x2 = (x + 1) * tamanho_quadrado
+                    y2 = (y + 1) * tamanho_quadrado
+
+                    # Se a Checkbox de contorno estiver marcada, desenhe o retângulo com outline
+                    if exibir_contorno:
+                        self.canvas.create_rectangle(x1, y1, x2, y2, fill=cor, outline=referencias.cores["cinza"])
+                    else:
+                        self.canvas.create_rectangle(x1, y1, x2, y2, fill=cor, outline="")
 
     def criar_mundo(self, largura, altura):
         # Crie o mundo com as dimensões desejadas

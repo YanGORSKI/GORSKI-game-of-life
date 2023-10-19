@@ -1,6 +1,7 @@
 import pygame
 import config
 import referencias
+from janela_canvas import Canvas
 
 # Defina algumas cores para uso
 preto = referencias.cores["preto"]
@@ -12,12 +13,17 @@ cinza_claro = referencias.cores["cinza_claro"]
 largura_barra_lateral = config.largura_janela * config.proporcao_barra_lateral
 
 class BarraLateral:
-    def __init__(self, screen):
+    def __init__(self, screen, canvas):
         self.screen = screen
+        self.canvas = canvas
 
     def atualizar(self):
         # Código relacionado à barra lateral
         self.criar_barra_lateral()
+        
+    def processar_clique(self, posicao):
+        if self.botao_gerar_terreno.collidepoint(posicao):
+            self.canvas.criar_canvas()
 
     def criar_barra_lateral(self):
         largura_janela = config.largura_janela

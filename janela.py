@@ -12,11 +12,11 @@ class JanelaPrincipal:
         self.screen = pygame.display.set_mode((config.largura_janela, config.altura_janela))
         pygame.display.set_caption("Life Simulator")
         
-        # INICIALIZA A BARRA LATERAL
-        self.barra_lateral = BarraLateral(self.screen)
         
         # INICIALIZA O CANVAS
         self.canvas = Canvas(self.screen)
+        # INICIALIZA A BARRA LATERAL
+        self.barra_lateral = BarraLateral(self.screen, self.canvas)
         
 
     def run(self):
@@ -32,6 +32,9 @@ class JanelaPrincipal:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     run = False
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:  # Botão esquerdo do mouse
+                        self.barra_lateral.processar_clique(event.pos)  # Repasse o clique para a BarraLateral
                     
 
             self.screen.fill(referencias.cores["preto"])  # Preencha a tela com a cor de fundo
