@@ -4,7 +4,7 @@ class Lugar:
     def __init__(self, x, y, conteudo=None, passavel=True):
         self.x = x
         self.y = y
-        self.terreno = self.gerar_terreno()
+        self.terreno = None
         self.conteudo = conteudo
         self.passavel = passavel
         self.vizinho_norte = None

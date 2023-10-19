@@ -1,15 +1,21 @@
-import tkinter as tk
-from config import largura_janela, altura_janela, proporcao_barra_lateral
-from janela_app import JanelaApp
-from referencias import terrenos
+import pygame
+import janela
+import config
+from janela import JanelaPrincipal
+
+def main():
+    pygame.init()
+
+    largura_janela = config.largura_janela
+    altura_janela = config.altura_janela
+
+    # Crie a janela com as dimensões definidas no config.py
+    screen = pygame.display.set_mode((largura_janela, altura_janela))
+    pygame.display.set_caption("Simulador de Vida")
+
+    # Inicialize a janela e comece a execução do jogo
+    janela = JanelaPrincipal()
+    janela.run()
 
 if __name__ == "__main__":
-    janela = tk.Tk()
-
-    # Crie a instância da classe GraficoJanela
-    janelaApp = JanelaApp(janela)
-    
-    # Obtenha as configurações de tamanho da janela
-    janela.geometry(f"{largura_janela}x{altura_janela}")
-
-    janela.mainloop()
+    main()
