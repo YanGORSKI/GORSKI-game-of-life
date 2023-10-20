@@ -16,6 +16,7 @@ class BarraLateral:
     def __init__(self, screen, canvas):
         self.screen = screen
         self.canvas = canvas
+        self.botao_gerar_terreno = pygame.Rect(20, 120, 200, 50)  # Ajuste a posição do botão
 
     def atualizar(self):
         # Código relacionado à barra lateral
@@ -23,7 +24,7 @@ class BarraLateral:
         
     def processar_clique(self, posicao):
         if self.botao_gerar_terreno.collidepoint(posicao):
-            self.canvas.criar_canvas()
+            self.canvas.criar_mundo(24, 24)
 
     def criar_barra_lateral(self):
         largura_janela = config.largura_janela

@@ -17,13 +17,13 @@ class Canvas:
         self.criar_canvas()
         
     def criar_canvas(self):
-        exibir_contorno = True
+        exibir_contorno = False
         tamanho_mundo = 24
-        tamanho_quadrado = config.altura_janela / tamanho_mundo
-        
-        # Adicione a lógica para desenhar o mundo no "canvas" aqui
+        tamanho_canvas = config.largura_janela - config.largura_barra_lateral
+
+        tamanho_quadrado = tamanho_canvas / tamanho_mundo
+
         if self.mundo:
-           # Percorra todos os lugares do mundo
             for y in range(tamanho_mundo):
                 for x in range(tamanho_mundo):
                     lugar = self.mundo.obter_lugar(x, y)
@@ -31,20 +31,21 @@ class Canvas:
                     cor = referencias.terrenos[tipo_terreno]["cor"]
 
                     # Calcule as coordenadas do retângulo
-                    x1 = x * tamanho_quadrado
+                    x1 = x * tamanho_quadrado + config.largura_barra_lateral  # Adicione a largura da barra lateral ao X
                     y1 = y * tamanho_quadrado
-                    x2 = (x + 1) * tamanho_quadrado
-                    y2 = (y + 1) * tamanho_quadrado
 
+                    # Crie um retângulo na tela usando pygame.draw.rect
+                    pygame.draw.rect(self.screen, cor, (x1, y1, tamanho_quadrado, tamanho_quadrado))
+                    
                     # Se a Checkbox de contorno estiver marcada, desenhe o retângulo com outline
                     if exibir_contorno:
-                        self.canvas.create_rectangle(x1, y1, x2, y2, fill=cor, outline=referencias.cores["cinza"])
-                    else:
-                        self.canvas.create_rectangle(x1, y1, x2, y2, fill=cor, outline="")
+                        pygame.draw.rect(self.screen, referencias.cores["cinza"], (x1, y1, tamanho_quadrado, tamanho_quadrado), 1)
+
 
     def criar_mundo(self, largura, altura):
         # Crie o mundo com as dimensões desejadas
         self.mundo = Mundo(largura, altura)
+        
         # Adicione a lógica para gerar o terreno no mundo conforme necessário
 
     # Outros métodos para manipular elementos gráficos no "canvas"

@@ -8,7 +8,7 @@ class Mundo:
         self.largura = largura
         self.altura = altura
         self.mapa = [[Lugar(x, y, conteudo=None) for x in range(largura)] for y in range(altura)]
-        self.gerar_terrenos_base(100.0, 6, 0.5, 2.0, -1.0, 1.0, 1024, 1024, 24, 0.3, 0.4, 0.65)
+        self.gerar_terrenos_base(50.0, 6, 0.5, 2.0, -1.0, 1.0, 1024, 1024, 24, 0.4, 0.45, 0.60)
 
     def obter_lugar(self, x, y):
         return self.mapa[y][x]
